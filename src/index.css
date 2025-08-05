@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom cake cursor */
+* {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewport='0 0 32 32' style='fill:black;font-size:24px;'><text y='24'>🍰</text></svg>") 16 16, auto;
+}
+
+/* Pointer cursor for interactive elements */
+button, 
+a, 
+input[type="submit"], 
+input[type="button"], 
+[role="button"],
+.cursor-pointer {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewport='0 0 32 32' style='fill:black;font-size:24px;'><text y='24'>🎂</text></svg>") 16 16, pointer;
+}
+
+/* Text cursor for input fields */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+textarea {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewport='0 0 32 32' style='fill:black;font-size:20px;'><text y='20'>🧁</text></svg>") 16 16, text;
+}
