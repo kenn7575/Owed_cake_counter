@@ -12,12 +12,14 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [suggestions, setSuggestions] = useState<Array<{ name: string; total: number }>>([]);
+  const [isFocused, setIsFocused] = useState(false);
+  const focusRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handler = setTimeout(async () => {
       const query = personName.trim();
-      if (!query) {
+      if (!query || !focusRef.current) {
         setSuggestions([]);
         return;
       }
@@ -27,8 +29,8 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
         .select('person_name')
         .ilike('person_name', `%${query}%`);
 
-      if (error || !data) {
-        console.error('Error fetching suggestions:', error);
+      if (error || !data || !focusRef.current) {
+        if (error) console.error('Error fetching suggestions:', error);
         setSuggestions([]);
         return;
       }
@@ -42,11 +44,11 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
       const results = Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .map(([name, total]) => ({ name, total }));
-      setSuggestions(results);
+      if (focusRef.current) setSuggestions(results);
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [personName]);
+  }, [personName, isFocused]);
 
   const handleSelect = (name: string) => {
     setPersonName(name);
@@ -96,7 +98,15 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
                 ref={inputRef}
                 value={personName}
                 onChange={(e) => setPersonName(e.target.value)}
-                onBlur={() => setTimeout(() => setSuggestions([]), 100)}
+                onFocus={() => {
+                  focusRef.current = true;
+                  setIsFocused(true);
+                }}
+                onBlur={() => {
+                  focusRef.current = false;
+                  setIsFocused(false);
+                  setTimeout(() => setSuggestions([]), 100);
+                }}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all duration-200 outline-none"
                 placeholder="Enter person's name"
                 required
