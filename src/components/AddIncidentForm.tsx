@@ -56,12 +56,40 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
     inputRef.current?.blur();
   };
 
+  const checkForTroll = async (name: string, description: string) => {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!apiKey) return false;
+    try {
+      const response = await fetch('https://api.openai.com/v1/moderations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'omni-moderation-latest',
+          input: `${name}\n${description}`,
+        }),
+      });
+      const data = await response.json();
+      return data.results?.[0]?.flagged || false;
+    } catch (error) {
+      console.error('Error checking for troll:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!personName.trim()) return;
 
     setIsSubmitting(true);
     try {
+      const isTroll = await checkForTroll(personName.trim(), notes.trim());
+      if (isTroll) {
+        window.alert('Your incident was flagged as a troll post and was not submitted.');
+        return;
+      }
       await onAdd(personName.trim(), notes.trim() || undefined);
     } finally {
       setIsSubmitting(false);
