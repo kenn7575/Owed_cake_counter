@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { BarChart3, TrendingUp, Calendar, Award } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachWeekOfInterval, subYears, parseISO } from 'date-fns';
+import { format, endOfWeek, eachWeekOfInterval, parseISO } from 'date-fns';
 import type { CakeIncident } from '../App';
 
 ChartJS.register(

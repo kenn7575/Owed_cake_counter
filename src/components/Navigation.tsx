@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, Home, TrendingUp } from 'lucide-react';
+import { BarChart3, Home } from 'lucide-react';
 
 interface NavigationProps {
   currentPage: 'home' | 'stats';

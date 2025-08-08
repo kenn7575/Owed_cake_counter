@@ -78,7 +78,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
             <div className="relative">
               <label htmlFor="personName" className="block text-sm font-semibold text-gray-700 mb-2">
                 Who forgot to lock their computer? *
@@ -92,6 +92,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
                 placeholder="Enter person's name"
                 required
                 disabled={isSubmitting}
+                autoComplete="off"
               />
               {suggestions.length > 0 && (
                 <ul className="absolute z-10 mt-1 w-full bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
@@ -125,6 +126,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
                 placeholder="Any additional details..."
                 rows={3}
                 disabled={isSubmitting}
+                autoComplete="off"
               />
             </div>
 
