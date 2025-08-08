@@ -56,12 +56,86 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
     inputRef.current?.blur();
   };
 
+  const checkForTroll = async (name: string, description: string) => {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!apiKey) return false;
+    try {
+      const response = await fetch('https://api.openai.com/v1/moderations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'omni-moderation-latest',
+          input: `${name}\n${description}`,
+        }),
+      });
+      const data = await response.json();
+      return data.results?.[0]?.flagged || false;
+    } catch (error) {
+      console.error('Error checking for troll:', error);
+      return false;
+    }
+  };
+
+  const validateIncident = async (
+    name: string,
+    description: string
+  ): Promise<{ validName: boolean; relevant: boolean }> => {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!apiKey) return { validName: true, relevant: true };
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You validate cake incident reports. Return JSON {"validName": boolean, "relevant": boolean}. "validName" is false if the name is not a plausible person name. "relevant" is true only if the description relates to cake or leaving a computer unlocked. Only return JSON.',
+            },
+            {
+              role: 'user',
+              content: `Name: ${name}\nDescription: ${description}`,
+            },
+          ],
+          max_tokens: 20,
+        }),
+      });
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content?.trim();
+      if (!text) return { validName: true, relevant: true };
+      return JSON.parse(text);
+    } catch (error) {
+      console.error('Error validating incident:', error);
+      return { validName: true, relevant: true };
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!personName.trim()) return;
 
     setIsSubmitting(true);
     try {
+      const isTroll = await checkForTroll(personName.trim(), notes.trim());
+      if (isTroll) {
+        window.alert('Your incident was flagged as a troll post and was not submitted.');
+        return;
+      }
+      const validation = await validateIncident(personName.trim(), notes.trim());
+      if (!validation.validName || !validation.relevant) {
+        window.alert(
+          'Please provide a valid name and ensure the notes are about cake or leaving your computer unlocked.'
+        );
+        return;
+      }
       await onAdd(personName.trim(), notes.trim() || undefined);
     } finally {
       setIsSubmitting(false);
