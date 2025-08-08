@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Cake } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface AddIncidentFormProps {
   onAdd: (personName: string, notes?: string) => void;
@@ -10,6 +11,50 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
   const [personName, setPersonName] = useState('');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<{ name: string; total: number }>>([]);
+  const [isFocused, setIsFocused] = useState(false);
+  const focusRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = setTimeout(async () => {
+      const query = personName.trim();
+      if (!query || !focusRef.current) {
+        setSuggestions([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('cake_incidents')
+        .select('person_name')
+        .ilike('person_name', `%${query}%`);
+
+      if (error || !data || !focusRef.current) {
+        if (error) console.error('Error fetching suggestions:', error);
+        setSuggestions([]);
+        return;
+      }
+
+      const counts: Record<string, number> = {};
+      data.forEach((row) => {
+        const name = row.person_name as string;
+        counts[name] = (counts[name] || 0) + 1;
+      });
+
+      const results = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, total]) => ({ name, total }));
+      if (focusRef.current) setSuggestions(results);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [personName, isFocused]);
+
+  const handleSelect = (name: string) => {
+    setPersonName(name);
+    setSuggestions([]);
+    inputRef.current?.blur();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,21 +87,50 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+            <div className="relative">
               <label htmlFor="personName" className="block text-sm font-semibold text-gray-700 mb-2">
                 Who forgot to lock their computer? *
               </label>
               <input
                 type="text"
                 id="personName"
+                ref={inputRef}
                 value={personName}
                 onChange={(e) => setPersonName(e.target.value)}
+                onFocus={() => {
+                  focusRef.current = true;
+                  setIsFocused(true);
+                }}
+                onBlur={() => {
+                  focusRef.current = false;
+                  setIsFocused(false);
+                  setTimeout(() => setSuggestions([]), 100);
+                }}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all duration-200 outline-none"
                 placeholder="Enter person's name"
                 required
                 disabled={isSubmitting}
+                autoComplete="off"
               />
+              {suggestions.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  {suggestions.map((s) => (
+                    <li key={s.name}>
+                      <button
+                        type="button"
+                        onMouseDown={() => handleSelect(s.name)}
+                        className="w-full text-left px-4 py-2 hover:bg-amber-50 flex justify-between items-center"
+                      >
+                        <span>{s.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {s.total} incident{s.total !== 1 ? 's' : ''}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div>
@@ -71,6 +145,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
                 placeholder="Any additional details..."
                 rows={3}
                 disabled={isSubmitting}
+                autoComplete="off"
               />
             </div>
 
