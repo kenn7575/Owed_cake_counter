@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Cake } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -12,6 +12,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [suggestions, setSuggestions] = useState<Array<{ name: string; total: number }>>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handler = setTimeout(async () => {
@@ -46,6 +47,12 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
 
     return () => clearTimeout(handler);
   }, [personName]);
+
+  const handleSelect = (name: string) => {
+    setPersonName(name);
+    setSuggestions([]);
+    inputRef.current?.blur();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,8 +93,10 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
               <input
                 type="text"
                 id="personName"
+                ref={inputRef}
                 value={personName}
                 onChange={(e) => setPersonName(e.target.value)}
+                onBlur={() => setTimeout(() => setSuggestions([]), 100)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all duration-200 outline-none"
                 placeholder="Enter person's name"
                 required
@@ -100,7 +109,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
                     <li key={s.name}>
                       <button
                         type="button"
-                        onClick={() => setPersonName(s.name)}
+                        onMouseDown={() => handleSelect(s.name)}
                         className="w-full text-left px-4 py-2 hover:bg-amber-50 flex justify-between items-center"
                       >
                         <span>{s.name}</span>
