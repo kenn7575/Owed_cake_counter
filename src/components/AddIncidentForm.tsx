@@ -79,6 +79,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
     }
   };
 
+
   const validateIncident = async (
     name: string,
     description: string
@@ -118,6 +119,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
     }
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!personName.trim()) return;
@@ -129,6 +131,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
         window.alert('Your incident was flagged as a troll post and was not submitted.');
         return;
       }
+
       const validation = await validateIncident(personName.trim(), notes.trim());
       if (!validation.validName || !validation.relevant) {
         window.alert(
@@ -136,6 +139,7 @@ export const AddIncidentForm: React.FC<AddIncidentFormProps> = ({ onAdd, onClose
         );
         return;
       }
+
       await onAdd(personName.trim(), notes.trim() || undefined);
     } finally {
       setIsSubmitting(false);
