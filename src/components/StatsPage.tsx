@@ -291,23 +291,23 @@ export const StatsPage: React.FC<StatsPageProps> = ({ incidents }) => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center transition-transform duration-200 hover:shadow-xl hover:scale-105">
           <div className="text-3xl font-bold text-blue-600">{totalIncidents}</div>
           <div className="text-sm text-gray-600 mt-1">Total Incidents</div>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center transition-transform duration-200 hover:shadow-xl hover:scale-105">
           <div className="text-3xl font-bold text-green-600">{totalDelivered}</div>
           <div className="text-sm text-gray-600 mt-1">Cakes Delivered</div>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center transition-transform duration-200 hover:shadow-xl hover:scale-105">
           <div className="text-3xl font-bold text-red-600">{totalOwed}</div>
           <div className="text-sm text-gray-600 mt-1">Cakes Owed</div>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center transition-transform duration-200 hover:shadow-xl hover:scale-105">
           <div className="text-3xl font-bold text-purple-600">{deliveryRate}%</div>
           <div className="text-sm text-gray-600 mt-1">Delivery Rate</div>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center transition-transform duration-200 hover:shadow-xl hover:scale-105">
           <div className="text-lg font-bold text-amber-600 truncate">
             {topDebtor ? topDebtor.name : 'N/A'}
           </div>
@@ -318,7 +318,7 @@ export const StatsPage: React.FC<StatsPageProps> = ({ incidents }) => {
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Bar Chart */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 transition-transform duration-200 hover:shadow-2xl hover:scale-105">
           <div className="h-96">
             {personStats.length > 0 ? (
               <Bar data={barChartData} options={barChartOptions} />
@@ -335,7 +335,7 @@ export const StatsPage: React.FC<StatsPageProps> = ({ incidents }) => {
         </div>
 
         {/* Line Chart */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 transition-transform duration-200 hover:shadow-2xl hover:scale-105">
           <div className="mb-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -371,7 +371,7 @@ export const StatsPage: React.FC<StatsPageProps> = ({ incidents }) => {
 
       {/* Detailed Leaderboard */}
       {personStats.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 transition-transform duration-200 hover:shadow-2xl hover:scale-105">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
             <Award className="h-6 w-6 text-amber-600" />
             Detailed Leaderboard
