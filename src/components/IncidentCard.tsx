@@ -28,9 +28,9 @@ export const IncidentCard: React.FC<IncidentCardProps> = ({ incident, onToggleDe
   };
 
   return (
-    <div className={`p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-      incident.cake_delivered 
-        ? 'border-green-200 bg-green-50' 
+    <div className={`p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-md hover:scale-105 ${
+      incident.cake_delivered
+        ? 'border-green-200 bg-green-50'
         : 'border-red-200 bg-red-50'
     }`}>
       <div className="flex items-start justify-between">
